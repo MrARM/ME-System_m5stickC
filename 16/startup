@@ -1,0 +1,20 @@
+local mesys = peripheral.wrap("right")
+
+local ws, err = http.websocket("ws://127.0.0.1:8000")
+if ws then
+  ws.send("CC Connected,2,1,Version: 3,1,1")
+end
+
+while ws do
+    for k, v in pairs(mesys.listAvailableItems()) do
+        if v.count > 100 then
+            os.sleep(5)
+            local item = mesys.findItem(v.name).getMetadata()
+            if string.len(item.displayName) > 11 then
+                ws.send(item.displayName..",1,1,Count: "..item.count..",1,2")
+            else
+                ws.send(item.displayName..",2,1,Count: "..item.count..",1,2")
+            end
+        end
+    end
+end
